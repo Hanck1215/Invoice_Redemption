@@ -4,29 +4,10 @@ Created on Wed Dec 28 18:10:00 2022
 
 @author: 88696
 """
+import keyboard
+import time
 
 class InvoiceRedemptionMachine :
-        
-    
-    class DataBase :
-        data = set()
-        
-        def save(self, number) :
-            self.data.add(number)
-            
-        def delete(self, number) :
-            self.data.discard(number)
-            
-        def size(self) :
-            return len(self.data)
-        
-        def search(self, number) :
-            if number in self.data :
-                return True
-            else :
-                return False
-    
-    database =  DataBase()
     
     data_posiotion = {}
     cursor = 1 
@@ -46,8 +27,32 @@ class InvoiceRedemptionMachine :
     five = {}
     four = {}
     three = {}
-
-
+    
+    pointer = 1
+    current_page = 1
+    pages = {1:["對獎", "儲存"], 2:["回上頁", "特別獎", "特獎", "頭獎", "二獎", "三獎", "四獎", "五獎", "六獎"], 3:["繼續", "返主頁"]}
+    Input = "請輸入八位數字: "
+    
+    class DataBase :
+        data = set()
+        
+        def save(self, number) :
+            self.data.add(number)
+            
+        def delete(self, number) :
+            self.data.discard(number)
+            
+        def size(self) :
+            return len(self.data)
+        
+        def search(self, number) :
+            if number in self.data :
+                return True
+            else :
+                return False
+            
+    database =  DataBase()
+    
     def store(self, number) :
         if len(number) != 8 :
             return 0 #非八位數
@@ -137,16 +142,166 @@ class InvoiceRedemptionMachine :
             return []
         
     def redemption_sixth_prize(self, number) :
+        
         three_num = number[5:8]
         if self.three.get(three_num) is not None :
             return self.three.get(three_num)
         else :
             return []
+    
+    def screen_update(self, num = "") :
+        print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        #print(self.current_page, self.pointer)
         
+        if self.pointer is False :
+            self.Input = self.Input + num
+            print(self.Input)
+            return True
+        
+        catalog = self.pages.get(self.current_page)
+        for i in range(1, len(catalog)+1) :
+           
+            print(i, ".", catalog[i-1], end = "")
+            if i == self.pointer :
+                print(" <--", end = "")
+            print()
+            
+    def keyboard_up(self) :
+        
+        if self.pointer is False :
+            self.screen_update("8")
+            return True
+        
+        if self.pointer == 1 :
+            self.screen_update()
+            return False
+        else :
+            self.pointer = self.pointer - 1
+            self.screen_update()
+            return True
+        
+    
+    def keyboard_down(self) :
+        
+        if self.pointer is False :
+            self.screen_update("2")
+            return True
+        
+        catalog = self.pages.get(self.current_page)
+        length = len(catalog)
+        
+        if self.pointer == length :
+            self.screen_update()
+            return False
+        else :
+            self.pointer = self.pointer + 1
+            self.screen_update()
+            return True
+        
+    def keyboard_1(self) :
+        if self.pointer is False :
+            self.screen_update("1")
+            
+    def keyboard_3(self) :
+        if self.pointer is False :
+            self.screen_update("3")
+            
+    def keyboard_4(self) :
+        if self.pointer is False :
+            self.screen_update("4")
+            
+    def keyboard_5(self) :
+        if self.pointer is False :
+            self.screen_update("5")
+            
+    def keyboard_6(self) :
+        if self.pointer is False :
+            self.screen_update("6")
+            
+    def keyboard_7(self) :
+        if self.pointer is False :
+            self.screen_update("7")
+            
+    def keyboard_9(self) :
+        if self.pointer is False :
+            self.screen_update("9")
+        
+    def keyboard_enter(self) :
+        if self.pointer == 1 and self.current_page == 1 :
+            print(100)
+            self.current_page = 2
+            self.screen_update()
+            
+        elif self.pointer == 2 and self.current_page == 1 :
+            self.pointer = False
+            self.current_page = 1
+            self.screen_update()
+            
+            
+        elif self.current_page == 2 and self.pointer == 1 :
+            self.current_page = 1
+            self.screen_update()
+            
+        elif self.current_page == 3 and self.pointer == 1 :
+            self.pointer = False
+            self.current_page = 1
+            self.screen_update()
+            
+        elif self.current_page == 3 and self.pointer == 2 :
+            self.pointer = 1
+            self.current_page = 1
+            self.screen_update()
+            
+        elif self.current_page == 2 and self.pointer != 1 :
+            self.pointer = False
+            self.screen_update()
+        
+        elif self.pointer is False :
+            if len(self.Input) != 17 :
+                self.Input = "請輸入八位數字: 必須是八位數!"
+                self.screen_update()
+                time.sleep(2)
+                self.Input = "請輸入八位數字: "
+                self.screen_update()
+            else :
+                if self.current_page == 1 :
+                    self.store(self.Input[9:17])
+                    print(self.pointer)
+                    self.Input = "儲存成功!"
+                    self.screen_update()
+                    time.sleep(1)
+                    self.current_page = 3
+                    self.pointer = 1
+                    self.Input = "請輸入八位數字: "
+                    self.screen_update()
+                    print("目前有: ", self.database.data)
+                elif self.current_page == 2 :
+                    if self.pointer == 2 :
+                        print()
 
+    def __init__(self) :
+        keyboard.on_press_key("1", lambda _:self.keyboard_1())
+        keyboard.on_press_key("3", lambda _:self.keyboard_3())
+        keyboard.on_press_key("4", lambda _:self.keyboard_4())
+        keyboard.on_press_key("5", lambda _:self.keyboard_5())
+        keyboard.on_press_key("6", lambda _:self.keyboard_6())
+        keyboard.on_press_key("7", lambda _:self.keyboard_7())
+        keyboard.on_press_key("9", lambda _:self.keyboard_9())
+        keyboard.on_press_key("8", lambda _:self.keyboard_up())
+        keyboard.on_press_key("2", lambda _:self.keyboard_down())
+        keyboard.on_press_key("enter", lambda _:self.keyboard_enter())
+        self.pointer = False
+        self.Input = "歡迎使用發票對獎機!"
+        self.screen_update()
+        time.sleep(2)
+        self.pointer = 1
+        self.current_page = 1
+        self.Input = "請輸入八位數字: "
+        self.screen_update()
         
-        
-        
+    
+a = InvoiceRedemptionMachine()
+
         
             
     

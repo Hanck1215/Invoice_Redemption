@@ -6,11 +6,13 @@ Created on Wed Dec 28 18:29:22 2022
 """
 
 import keyboard
+import invoice
 import time
 
 #keyboard.on_press_key("num lock", lambda _:print("You pressed r"))
 
 class oled_displayer :
+    
     cursor = 1
     current_page = 1
     pages = {1:["對獎", "儲存"], 2:["回上頁", "特別獎", "特獎", "頭獎", "二獎", "三獎", "四獎", "五獎", "六獎"], 3:["繼續", "返主頁"]}
@@ -93,25 +95,31 @@ class oled_displayer :
             self.cursor = 1
             self.current_page = 1
             self.screen_update()
+            
+        elif self.current_page == 2 and self.cursor != 1 :
+            self.cursor = False
+            self.screen_update()
         
         elif self.cursor is False :
             if len(self.Input) != 17 :
                 self.Input = "請輸入八位數字: 必須是八位數!"
                 self.screen_update()
-                time.sleep(5)
+                time.sleep(2)
                 self.Input = "請輸入八位數字: "
                 self.screen_update()
             else :
                 if self.current_page == 1 :
                     self.Input = "儲存成功!"
                     self.screen_update()
-                    time.sleep(3)
+                    time.sleep(1)
                     self.current_page = 3
                     self.cursor = 1
                     self.Input = "請輸入八位數字: "
                     self.screen_update()
                     
-                    
+                elif self.current_page == 2 :
+                    if self.cursor == 2 :
+                        print()
         
         
 
